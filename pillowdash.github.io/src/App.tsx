@@ -1,0 +1,509 @@
+import { useState, useEffect } from 'react';
+
+// KaTeX CSS loaded via CDN in index.html
+declare global {
+  interface Window {
+    katex: {
+      render: (tex: string, element: HTMLElement, options?: object) => void;
+    };
+  }
+}
+
+interface ProofCardProps {
+  title: string;
+  formula: string;
+  description: string;
+  link?: string;
+  linkText?: string;
+}
+
+function ProofCard({ title, formula, description, link, linkText }: ProofCardProps) {
+  useEffect(() => {
+    const element = document.getElementById(`formula-${title.replace(/\s/g, '-')}`);
+    if (element && window.katex) {
+      window.katex.render(formula, element, { throwOnError: false, displayMode: true });
+    }
+  }, [formula, title]);
+
+  return (
+    <div className="group bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-lg hover:border-indigo-200 transition-all duration-300">
+      <h3 className="text-lg font-semibold text-slate-800 mb-3 group-hover:text-indigo-600 transition-colors">
+        {title}
+      </h3>
+      <div 
+        id={`formula-${title.replace(/\s/g, '-')}`}
+        className="bg-gradient-to-r from-slate-50 to-indigo-50 rounded-xl p-4 mb-4 text-center overflow-x-auto"
+      />
+      <p className="text-slate-600 text-sm leading-relaxed mb-4">{description}</p>
+      {link && (
+        <a 
+          href={link} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
+        >
+          {linkText || 'View Solution'}
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+        </a>
+      )}
+    </div>
+  );
+}
+
+interface WorkflowCardProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  tags: string[];
+}
+
+function WorkflowCard({ icon, title, description, tags }: WorkflowCardProps) {
+  return (
+    <div className="group bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-lg hover:border-emerald-200 transition-all duration-300">
+      <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+        {icon}
+      </div>
+      <h3 className="text-lg font-semibold text-slate-800 mb-2">{title}</h3>
+      <p className="text-slate-600 text-sm leading-relaxed mb-4">{description}</p>
+      <div className="flex flex-wrap gap-2">
+        {tags.map((tag, index) => (
+          <span 
+            key={index}
+            className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-full"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  const [activeSection, setActiveSection] = useState<'workflows' | 'proofs'>('proofs');
+  const [katexLoaded, setKatexLoaded] = useState(false);
+
+  useEffect(() => {
+    // Load KaTeX CSS
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css';
+    document.head.appendChild(link);
+
+    // Load KaTeX JS
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js';
+    script.async = true;
+    script.onload = () => setKatexLoaded(true);
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(link);
+      document.head.removeChild(script);
+    };
+  }, []);
+
+  const proofs: ProofCardProps[] = [
+    {
+      title: "Limit of 1/x³ at x=2",
+      formula: "\\lim_{x\\to 2} \\frac{1}{x^3} = \\frac{1}{8}",
+      description: "Rigorous proof using the formal definition of a limit. We analyze the behavior as x approaches the constant a.",
+    },
+    {
+      title: "General Limit of 1/x",
+      formula: "\\lim_{x \\to a} \\frac{1}{x} = \\frac{1}{a}",
+      description: "Exploration of the ε-δ relationship for rational functions.",
+      link: "https://math.stackexchange.com/questions/1872265/epsilon-delta-proof-lim-limits-x-to-a-frac1x-frac1a",
+      linkText: "View Detailed Solution"
+    },
+    {
+      title: "Rational Function Proof",
+      formula: "\\lim_{x\\rightarrow -2} \\frac{x-1}{x+1}=3",
+      description: "Application of the triangle inequality and bounding techniques for denominators near a point.",
+      link: "https://math.stackexchange.com/questions/1187971/using-epsilon-delta-definition-to-prove-that-lim-x-to-2-fracx-1x1",
+      linkText: "Discussion Thread"
+    },
+    {
+      title: "The Unit Case",
+      formula: "\\lim_{x \\to 1} \\frac{1}{x} = 1",
+      description: "A simplified case study highlighting the fundamental mechanics of the limit definition.",
+      link: "https://math.stackexchange.com/questions/418961/epsilon-delta-proof-that-lim-limits-x-to-1-frac1x-1",
+      linkText: "Step-by-Step Breakdown"
+    }
+  ];
+
+  const workflows: WorkflowCardProps[] = [
+    {
+      icon: (
+        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+      ),
+      title: "Automated Data Pipeline",
+      description: "End-to-end data processing workflow with validation, transformation, and storage.",
+      tags: ["Python", "ETL", "Automation"]
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
+      title: "Analytics Dashboard",
+      description: "Real-time metrics visualization with interactive charts and automated reporting.",
+      tags: ["React", "D3.js", "API"]
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      ),
+      title: "CI/CD Pipeline",
+      description: "Automated testing, building, and deployment with rollback capabilities.",
+      tags: ["GitHub Actions", "Docker", "AWS"]
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                <span className="text-white font-bold text-lg">P</span>
+              </div>
+              <span className="font-bold text-xl text-slate-800">PillowDash</span>
+            </div>
+            <nav className="hidden sm:flex items-center gap-1">
+              <button
+                onClick={() => setActiveSection('proofs')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  activeSection === 'proofs'
+                    ? 'bg-indigo-100 text-indigo-700'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                Proofs
+              </button>
+              <button
+                onClick={() => setActiveSection('workflows')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  activeSection === 'workflows'
+                    ? 'bg-indigo-100 text-indigo-700'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                Workflows
+              </button>
+            </nav>
+            <a 
+              href="https://github.com/pillowdash" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+              </svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10" />
+        <div className="absolute top-20 left-10 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse" />
+        <div className="absolute top-40 right-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse" style={{ animationDelay: '1s' }} />
+        
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium mb-6">
+              <span className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
+              Portfolio & Mathematical Proofs
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight">
+              Exploring the Beauty of
+              <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"> Mathematics</span>
+            </h1>
+            <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto mb-10">
+              A collection of rigorous ε-δ proofs, automated workflows, and technical explorations. 
+              Bridging theory with practical applications.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <button 
+                onClick={() => setActiveSection('proofs')}
+                className="px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
+              >
+                View Proofs
+              </button>
+              <button 
+                onClick={() => setActiveSection('workflows')}
+                className="px-6 py-3 bg-white text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition-colors border border-slate-200"
+              >
+                Explore Workflows
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mobile Navigation */}
+      <div className="sm:hidden sticky top-16 z-40 bg-white border-b border-slate-200 px-4 py-3">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setActiveSection('proofs')}
+            className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeSection === 'proofs'
+                ? 'bg-indigo-100 text-indigo-700'
+                : 'text-slate-600 bg-slate-100'
+            }`}
+          >
+            Proofs
+          </button>
+          <button
+            onClick={() => setActiveSection('workflows')}
+            className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeSection === 'workflows'
+                ? 'bg-indigo-100 text-indigo-700'
+                : 'text-slate-600 bg-slate-100'
+            }`}
+          >
+            Workflows
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        {/* Proofs Section */}
+        {activeSection === 'proofs' && (
+          <section>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-slate-800">Calculus: ε-δ Proofs</h2>
+                <p className="text-slate-500 text-sm">Rigorous mathematical proofs using formal definitions</p>
+              </div>
+            </div>
+            
+            {katexLoaded ? (
+              <div className="grid md:grid-cols-2 gap-6">
+                {proofs.map((proof, index) => (
+                  <ProofCard key={index} {...proof} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center py-20">
+                <div className="flex items-center gap-3 text-slate-500">
+                  <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Loading mathematical notation...
+                </div>
+              </div>
+            )}
+
+            {/* Bottom navigation buttons */}
+            <div className="mt-12 text-center flex flex-wrap justify-center gap-4">
+              <button 
+                onClick={() => setActiveSection('proofs')}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-full font-semibold shadow-lg transform transition-all duration-300"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>View Proofs</span>
+              </button>
+              <button 
+                onClick={() => setActiveSection('workflows')}
+                className="inline-flex items-center gap-2 bg-white/50 text-emerald-600 border-2 border-emerald-300 px-8 py-4 rounded-full font-semibold hover:bg-gradient-to-r hover:from-emerald-500 hover:to-teal-500 hover:text-white hover:border-transparent transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              >
+                <span>Explore Workflows</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* Workflows Section */}
+        {activeSection === 'workflows' && (
+          <section>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-slate-800">Workflows & Automation</h2>
+                <p className="text-slate-500 text-sm">Technical projects and automated systems</p>
+              </div>
+            </div>
+
+            {/* Robotic Process Automation Section */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-800">Robotic Process Automation</h3>
+              </div>
+              
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-lg hover:border-orange-200 transition-all duration-300">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-semibold text-slate-800 mb-2">Automation Anywhere Bot</h4>
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      Developing scalable solutions using the{' '}
+                      <a 
+                        href="https://www.automationanywhere.com/products/enterprise/community-edition" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="font-semibold text-orange-600 hover:text-orange-700 underline decoration-orange-300 hover:decoration-orange-500 transition-colors"
+                      >
+                        Automation Anywhere Community Edition
+                      </a>. 
+                      This workflow demonstrates process logic for data handling.
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Workflow Diagram Image */}
+                <div className="bg-gradient-to-r from-slate-50 to-orange-50 rounded-xl p-4 mb-4">
+                  <img 
+                    src="img/automationAnywhere.png" 
+                    alt="Automation Anywhere Workflow Diagram" 
+                    className="w-full rounded-lg shadow-sm border border-slate-200"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.parentElement!.innerHTML = `
+                        <div class="flex items-center justify-center h-48 text-slate-400">
+                          <svg class="w-12 h-12 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                          </svg>
+                          <span>Workflow diagram will appear here</span>
+                        </div>
+                      `;
+                    }}
+                  />
+                  <p className="text-slate-500 text-xs mt-3 text-center italic">
+                    Figure 1: Visual representation of the logic flow and bot structure.
+                  </p>
+                </div>
+                
+                {/* Tags and Links */}
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">RPA</span>
+                    <span className="px-3 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">Automation Anywhere</span>
+                    <span className="px-3 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">Bot Development</span>
+                  </div>
+                  <a 
+                    href="https://www.youtube.com/watch?v=mMaWTqTFM4w" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors shadow-sm"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                    Watch Demo
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Other Projects Section */}
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-slate-800">Other Projects</h3>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {workflows.map((workflow, index) => (
+                <WorkflowCard key={index} {...workflow} />
+              ))}
+            </div>
+
+            {/* Bottom navigation buttons */}
+            <div className="mt-12 text-center flex flex-wrap justify-center gap-4">
+              <button 
+                onClick={() => setActiveSection('proofs')}
+                className="inline-flex items-center gap-2 bg-white/50 text-indigo-600 border-2 border-indigo-300 px-8 py-4 rounded-full font-semibold hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:text-white hover:border-transparent transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+                </svg>
+                <span>View Proofs</span>
+              </button>
+              <button 
+                onClick={() => setActiveSection('workflows')}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-8 py-4 rounded-full font-semibold shadow-lg transform transition-all duration-300"
+              >
+                <span>Explore Workflows</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </button>
+            </div>
+          </section>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <span className="text-white font-bold text-lg">P</span>
+              </div>
+              <span className="font-bold text-xl">PillowDash</span>
+            </div>
+            <p className="text-slate-400 text-sm">
+              © {new Date().getFullYear()} PillowDash. All rights reserved.
+            </p>
+            <div className="flex items-center gap-4">
+              <a 
+                href="https://github.com/pillowdash" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-slate-400 hover:text-white transition-colors"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
