@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import * as d3 from 'd3';
 
 // KaTeX CSS loaded via CDN in index.html
 declare global {
@@ -57,6 +58,169 @@ interface WorkflowCardProps {
   title: string;
   description: string;
   tags: string[];
+}
+
+function D3BollingerChart() {
+  const chartRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!chartRef.current) return;
+    
+    // Clear previous
+    chartRef.current.innerHTML = "";
+
+    const margin = { top: 20, right: 30, bottom: 30, left: 50 };
+    const width = 800 - margin.left - margin.right;
+    const height = 400 - margin.top - margin.bottom;
+
+    const svg = d3.select(chartRef.current)
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+    svg.append("defs").append("clipPath")
+      .attr("id", "clip")
+      .append("rect")
+      .attr("width", width)
+      .attr("height", height);
+
+    function addBollingerBands(data: any[], n: number, k: number) {
+      let sum = 0; let sum2 = 0;
+      for (let i = 0; i < Math.min(n - 1, data.length); i++) {
+        data[i].mid = null; data[i].upper = null; data[i].lower = null;
+        sum += data[i].close; sum2 += data[i].close ** 2;
+      }
+      for (let i = n - 1; i < data.length; i++) {
+        const val = data[i].close;
+        sum += val; sum2 += val ** 2;
+        const mean = sum / n;
+        const stddev = Math.sqrt((sum2 - (sum ** 2) / n) / (n - 1));
+        data[i].mid = mean;
+        data[i].upper = mean + (stddev * k);
+        data[i].lower = mean - (stddev * k);
+        const val0 = data[i - n + 1].close;
+        sum -= val0; sum2 -= val0 ** 2;
+      }
+    }
+
+    const dataUrl = "https://raw.githubusercontent.com/plotly/datasets/master/finance-charts-apple.csv";
+
+    d3.csv(dataUrl).then(rawData => {
+      const data = rawData.map((d: any) => ({
+        date: new Date(d.Date),
+        close: +d["AAPL.Close"]
+      })).sort((a: any, b: any) => a.date - b.date);
+
+      addBollingerBands(data, 20, 2);
+
+      const xScale = d3.scaleTime()
+        .domain(d3.extent(data, (d: any) => d.date) as [Date, Date])
+        .range([0, width]);
+
+      const yScale = d3.scaleLinear()
+        .domain([
+          (d3.min(data, (d: any) => d.lower || d.close) || 0) * 0.95, 
+          (d3.max(data, (d: any) => d.upper || d.close) || 0) * 1.05
+        ])
+        .range([height, 0]);
+
+      const xAxis = svg.append("g")
+        .attr("class", "x-axis")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(xScale));
+
+      svg.append("g")
+        .attr("class", "y-axis")
+        .call(d3.axisLeft(yScale).tickFormat((d: any) => "$" + d));
+
+      const area = d3.area()
+        .defined((d: any) => d.upper !== null && d.lower !== null)
+        .x((d: any) => xScale(d.date))
+        .y0((d: any) => yScale(d.lower))
+        .y1((d: any) => yScale(d.upper));
+
+      const lineMid = d3.line()
+        .defined((d: any) => d.mid !== null)
+        .x((d: any) => xScale(d.date))
+        .y((d: any) => yScale(d.mid));
+
+      const lineClose = d3.line()
+        .x((d: any) => xScale(d.date))
+        .y((d: any) => yScale(d.close));
+
+      const lineGroup = svg.append("g")
+        .attr("clip-path", "url(#clip)");
+
+      lineGroup.append("path").datum(data).attr("fill", "lightsteelblue").attr("opacity", 0.3).attr("d", area as any);
+      lineGroup.append("path").datum(data).attr("fill", "none").attr("stroke", "#999").attr("stroke-width", "1px").attr("stroke-dasharray", "4,4").attr("d", lineMid as any);
+      lineGroup.append("path").datum(data).attr("fill", "none").attr("stroke", "steelblue").attr("stroke-width", "1.5px").attr("d", lineClose as any);
+
+      const tooltip = d3.select(chartRef.current).append("div")
+        .style("position", "absolute")
+        .style("text-align", "left")
+        .style("padding", "8px")
+        .style("font", "12px sans-serif")
+        .style("background", "rgba(0, 0, 0, 0.8)")
+        .style("color", "white")
+        .style("border-radius", "4px")
+        .style("pointer-events", "none")
+        .style("opacity", "0");
+
+      const focus = svg.append("g").style("display", "none");
+      focus.append("circle").attr("fill", "steelblue").attr("stroke", "white").attr("stroke-width", "2px").attr("r", 5);
+      const bisectDate = d3.bisector((d: any) => d.date).left;
+
+      const brush = d3.brushX()
+        .extent([[0, 0], [width, height]])
+        .on("end", updateChart);
+
+      const brushGroup = svg.append("g")
+        .attr("class", "brush")
+        .call(brush)
+        .on("mouseover", () => { focus.style("display", null); tooltip.style("opacity", "1"); })
+        .on("mouseout", () => { focus.style("display", "none"); tooltip.style("opacity", "0"); })
+        .on("mousemove", function(event) {
+          const [mx, my] = d3.pointer(event, chartRef.current);
+          const x0 = xScale.invert(d3.pointer(event, this)[0]);
+          const i = bisectDate(data, x0, 1);
+          const d0 = data[i - 1]; const d1 = data[i];
+          let d = d0;
+          if (d1) d = (+x0 - +d0.date) > (+d1.date - +x0) ? d1 : d0;
+
+          focus.select("circle").attr("transform", `translate(${xScale(d.date)}, ${yScale(d.close)})`);
+          tooltip.html(`
+              <strong>${d.date.toLocaleDateString()}</strong><br>
+              Close: $${d.close.toFixed(2)}<br>
+              <span style="color:#aaa">Mid: $${((d as any).mid ? (d as any).mid.toFixed(2) : "N/A")}</span>
+            `)
+            .style("left", (mx + 15) + "px")
+            .style("top", (my - 28) + "px");
+        });
+
+      function updateChart(event: any) {
+        const extent = event.selection;
+        if (!extent) return;
+        xScale.domain([ xScale.invert(extent[0]), xScale.invert(extent[1]) ]);
+        brushGroup.call(brush.move, null);
+        xAxis.transition().duration(1000).call(d3.axisBottom(xScale) as any);
+        lineGroup.select("path:nth-child(1)").transition().duration(1000).attr("d", area as any);
+        lineGroup.select("path:nth-child(2)").transition().duration(1000).attr("d", lineMid as any);
+        lineGroup.select("path:nth-child(3)").transition().duration(1000).attr("d", lineClose as any);
+      }
+
+      svg.on("dblclick", function() {
+        xScale.domain(d3.extent(data, (d: any) => d.date) as [Date, Date]);
+        xAxis.transition().duration(1000).call(d3.axisBottom(xScale) as any);
+        lineGroup.select("path:nth-child(1)").transition().duration(1000).attr("d", area as any);
+        lineGroup.select("path:nth-child(2)").transition().duration(1000).attr("d", lineMid as any);
+        lineGroup.select("path:nth-child(3)").transition().duration(1000).attr("d", lineClose as any);
+      });
+    });
+  }, []);
+
+  return <div ref={chartRef} className="relative overflow-x-auto" style={{ width: '100%', height: '420px' }}></div>;
 }
 
 function WorkflowCard({ icon, title, description, tags }: WorkflowCardProps) {
@@ -148,21 +312,11 @@ export default function App() {
     {
       icon: (
         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-      ),
-      title: "Analytics Dashboard",
-      description: "Real-time metrics visualization with interactive charts and automated reporting.",
-      tags: ["React", "D3.js", "API"]
-    },
-    {
-      icon: (
-        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
       ),
-      title: "CI/CD Pipeline",
-      description: "Automated testing, building, and deployment with rollback capabilities.",
+      title: "CI/CD Automation Pipeline",
+      description: "Automated testing, building, and deployment with rollback capabilities using industry standard tooling.",
       tags: ["GitHub Actions", "Docker", "AWS"]
     }
   ];
@@ -434,6 +588,43 @@ export default function App() {
                 </div>
               </div>
             </div>
+
+            {/* Analytics Dashboard Section */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-800">Analytics Dashboard</h3>
+              </div>
+              
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-lg transition-all duration-300">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-semibold text-slate-800 mb-2">Apple Stock (AAPL) - Bollinger Bands</h4>
+                    <p className="text-slate-600 text-sm">Interactive D3.js chart using Bollinger Bands algorithm. Brush/select a region to zoom in. Double click to reset.</p>
+                  </div>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 mb-4 h-[440px]">
+                  <D3BollingerChart />
+                </div>
+                <div className="flex flex-wrap gap-2 mt-4">
+                  <span className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-full">React</span>
+                  <span className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-full">D3.js</span>
+                  <span className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-full">API</span>
+                </div>
+              </div>
+            </div>
+
+
 
             {/* Other Projects Section */}
             <div className="flex items-center gap-3 mb-6">
