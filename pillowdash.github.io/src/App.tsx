@@ -246,7 +246,7 @@ function WorkflowCard({ icon, title, description, tags }: WorkflowCardProps) {
 }
 
 export default function App() {
-  const [activeSection, setActiveSection] = useState<'workflows' | 'proofs'>('proofs');
+  const [activeSection, setActiveSection] = useState<'workflows' | 'proofs'>('workflows');
   const [katexLoaded, setKatexLoaded] = useState(false);
 
   useEffect(() => {
@@ -335,16 +335,6 @@ export default function App() {
             </div>
             <nav className="hidden sm:flex items-center gap-1">
               <button
-                onClick={() => setActiveSection('proofs')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  activeSection === 'proofs'
-                    ? 'bg-indigo-100 text-indigo-700'
-                    : 'text-slate-600 hover:bg-slate-100'
-                }`}
-              >
-                Proofs
-              </button>
-              <button
                 onClick={() => setActiveSection('workflows')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   activeSection === 'workflows'
@@ -353,6 +343,16 @@ export default function App() {
                 }`}
               >
                 Workflows
+              </button>
+              <button
+                onClick={() => setActiveSection('proofs')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  activeSection === 'proofs'
+                    ? 'bg-indigo-100 text-indigo-700'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                Proofs
               </button>
             </nav>
             <a 
@@ -392,16 +392,16 @@ export default function App() {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <button 
-                onClick={() => setActiveSection('proofs')}
+                onClick={() => setActiveSection('workflows')}
                 className="px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
               >
-                View Proofs
+                Explore Workflows
               </button>
               <button 
-                onClick={() => setActiveSection('workflows')}
+                onClick={() => setActiveSection('proofs')}
                 className="px-6 py-3 bg-white text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition-colors border border-slate-200"
               >
-                Explore Workflows
+                View Proofs
               </button>
             </div>
           </div>
@@ -412,16 +412,6 @@ export default function App() {
       <div className="sm:hidden sticky top-16 z-40 bg-white border-b border-slate-200 px-4 py-3">
         <div className="flex gap-2">
           <button
-            onClick={() => setActiveSection('proofs')}
-            className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              activeSection === 'proofs'
-                ? 'bg-indigo-100 text-indigo-700'
-                : 'text-slate-600 bg-slate-100'
-            }`}
-          >
-            Proofs
-          </button>
-          <button
             onClick={() => setActiveSection('workflows')}
             className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               activeSection === 'workflows'
@@ -430,6 +420,16 @@ export default function App() {
             }`}
           >
             Workflows
+          </button>
+          <button
+            onClick={() => setActiveSection('proofs')}
+            className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeSection === 'proofs'
+                ? 'bg-indigo-100 text-indigo-700'
+                : 'text-slate-600 bg-slate-100'
+            }`}
+          >
+            Proofs
           </button>
         </div>
       </div>
@@ -472,22 +472,22 @@ export default function App() {
             {/* Bottom navigation buttons */}
             <div className="mt-12 text-center flex flex-wrap justify-center gap-4">
               <button 
-                onClick={() => setActiveSection('proofs')}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-full font-semibold shadow-lg transform transition-all duration-300"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>View Proofs</span>
-              </button>
-              <button 
                 onClick={() => setActiveSection('workflows')}
-                className="inline-flex items-center gap-2 bg-white/50 text-emerald-600 border-2 border-emerald-300 px-8 py-4 rounded-full font-semibold hover:bg-gradient-to-r hover:from-emerald-500 hover:to-teal-500 hover:text-white hover:border-transparent transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-full font-semibold shadow-lg transform transition-all duration-300"
               >
                 <span>Explore Workflows</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
+              </button>
+              <button 
+                onClick={() => setActiveSection('proofs')}
+                className="inline-flex items-center gap-2 bg-white/50 text-indigo-600 border-2 border-indigo-300 px-8 py-4 rounded-full font-semibold hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:text-white hover:border-transparent transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>View Proofs</span>
               </button>
             </div>
           </section>
@@ -505,6 +505,81 @@ export default function App() {
               <div>
                 <h2 className="text-2xl font-bold text-slate-800">Workflows & Automation</h2>
                 <p className="text-slate-500 text-sm">Technical projects and automated systems</p>
+              </div>
+            </div>
+
+            {/* AI Automation Workflows Section */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.813 15.904L9 18l-1.5 1.5h9L15 18l-.813-2.096M4 6h16M7 6V4h10v2m-9 6h.01M12 10h.01M16 10h.01M9 14h6m-7 7h8a2 2 0 002-2V8H6v11a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-800">AI Automation Workflows</h3>
+              </div>
+
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-lg hover:border-cyan-200 transition-all duration-300">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 3v2.25M14.25 3v2.25M4.5 9.75h15M6.75 6.75h10.5A2.25 2.25 0 0119.5 9v8.25a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 17.25V9A2.25 2.25 0 016.75 6.75z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13.5h6M9 16.5h3.75" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-semibold text-slate-800 mb-1">n8n + Supabase AI RAG Workflow</h4>
+                    <p className="text-slate-600 text-sm leading-relaxed mb-3">Key steps demonstrated:</p>
+                    <ul className="text-slate-600 text-sm leading-relaxed list-disc pl-5 space-y-1">
+                      <li>Local Supabase and n8n setup</li>
+                      <li>Document ingestion pipeline with OpenAI text embeddings</li>
+                      <li>Storing content and vectors in Supabase</li>
+                      <li>Building a chat workflow using AI Agent with memory and vector retrieval</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-r from-slate-50 to-cyan-50 rounded-xl p-4 mb-4">
+                  <img
+                    src="img/RAG_with_n8n.png"
+                    alt="n8n and Supabase AI RAG workflow diagram"
+                    className="w-full rounded-lg shadow-sm border border-slate-200"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.parentElement!.innerHTML = `
+                        <div class="flex items-center justify-center h-48 text-slate-400">
+                          <svg class="w-12 h-12 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                          </svg>
+                          <span>Workflow diagram will appear here</span>
+                        </div>
+                      `;
+                    }}
+                  />
+                  <p className="text-slate-500 text-xs mt-3 text-center italic">
+                    Figure 1: RAG workflow connecting document ingestion, vector storage, and chat retrieval.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs font-medium rounded-full">n8n</span>
+                    <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs font-medium rounded-full">Supabase</span>
+                    <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs font-medium rounded-full">AI</span>
+                    <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs font-medium rounded-full">RAG</span>
+                  </div>
+                  <a
+                    href="https://youtu.be/xYkyasMv7LM"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors shadow-sm"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                    Watch Demo
+                  </a>
+                </div>
               </div>
             </div>
 
@@ -589,6 +664,58 @@ export default function App() {
               </div>
             </div>
 
+            {/* WooCommerce Workflows Section */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 11h14a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-800">WooCommerce Workflows</h3>
+              </div>
+              
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-lg hover:border-purple-200 transition-all duration-300">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-semibold text-slate-800 mb-1"><a href="https://woocommerce.com/" 
+                           target="_blank" rel="noopener noreferrer"
+                           className="font-semibold text-orange-600 hover:text-orange-700 underline decoration-orange-300 hover:decoration-orange-500 transition-colors">WooCommerce</a> Transaction Workflow (Stripe Integration)</h4>
+                    <p className="text-slate-600 text-sm">Develop and test a complete e-commerce transaction flow, including payment processing, refund handling, and promotional logic. This workflow ensures accurate synchronization between WooCommerce, <a href="https://docs.stripe.com/sandboxes" 
+                           target="_blank" rel="noopener noreferrer"
+                           className="font-semibold text-orange-600 hover:text-orange-700 underline decoration-orange-300 hover:decoration-orange-500 transition-colors">Stripe</a> Sandbox, and backend database systems.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6 pt-4 border-t border-slate-100">
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">WooCommerce</span>
+                    <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">E-commerce</span>
+                    <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">Workflow</span>
+                  </div>
+                  <div className="flex justify-start">
+                    <a 
+                      href="https://youtu.be/Aimd1kfL0-8" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors shadow-sm"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                      </svg>
+                      Watch Demo
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Analytics Dashboard Section */}
             <div className="mb-12">
               <div className="flex items-center gap-3 mb-6">
@@ -645,6 +772,15 @@ export default function App() {
             {/* Bottom navigation buttons */}
             <div className="mt-12 text-center flex flex-wrap justify-center gap-4">
               <button 
+                onClick={() => setActiveSection('workflows')}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-full font-semibold shadow-lg transform transition-all duration-300"
+              >
+                <span>Explore Workflows</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </button>
+              <button 
                 onClick={() => setActiveSection('proofs')}
                 className="inline-flex items-center gap-2 bg-white/50 text-indigo-600 border-2 border-indigo-300 px-8 py-4 rounded-full font-semibold hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 hover:text-white hover:border-transparent transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
@@ -652,15 +788,6 @@ export default function App() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
                 </svg>
                 <span>View Proofs</span>
-              </button>
-              <button 
-                onClick={() => setActiveSection('workflows')}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-8 py-4 rounded-full font-semibold shadow-lg transform transition-all duration-300"
-              >
-                <span>Explore Workflows</span>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
               </button>
             </div>
           </section>
