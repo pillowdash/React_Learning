@@ -516,7 +516,7 @@ export default function App() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.813 15.904L9 18l-1.5 1.5h9L15 18l-.813-2.096M4 6h16M7 6V4h10v2m-9 6h.01M12 10h.01M16 10h.01M9 14h6m-7 7h8a2 2 0 002-2V8H6v11a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-slate-800">AI Automation Workflows</h3>
+                <h3 className="text-xl font-semibold text-slate-800">AI Automation</h3>
               </div>
 
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-lg hover:border-cyan-200 transition-all duration-300">
@@ -529,9 +529,39 @@ export default function App() {
                   </div>
                   <div>
                     <h4 className="text-lg font-semibold text-slate-800 mb-1">n8n + Supabase AI RAG Workflow</h4>
-                    <p className="text-slate-600 text-sm leading-relaxed mb-3">Key steps demonstrated:</p>
+                    <p className="text-slate-600 text-sm leading-relaxed mb-3">
+                      Agentic RAG workflow with vector retrieval, persistent memory, and tool-driven decisioning with{' '}
+                      <a
+                        href="https://n8n.io/ai/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold text-orange-600 hover:text-orange-700 underline decoration-orange-300 hover:decoration-orange-500 transition-colors"
+                      >
+                        n8n
+                      </a>{' '}
+                      and{' '}
+                      <a
+                        href="https://openai.com/api/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold text-orange-600 hover:text-orange-700 underline decoration-orange-300 hover:decoration-orange-500 transition-colors"
+                      >
+                        OpenAI API
+                      </a>
+                    </p>
                     <ul className="text-slate-600 text-sm leading-relaxed list-disc pl-5 space-y-1">
-                      <li>Local Supabase and n8n setup</li>
+                      <li>
+                        Local{' '}
+                        <a
+                          href="https://supabase.com/modules/vector"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-semibold text-orange-600 hover:text-orange-700 underline decoration-orange-300 hover:decoration-orange-500 transition-colors"
+                        >
+                          Supabase
+                        </a>{' '}
+                        and n8n setup
+                      </li>
                       <li>Document ingestion pipeline with OpenAI text embeddings</li>
                       <li>Storing content and vectors in Supabase</li>
                       <li>Building a chat workflow using AI Agent with memory and vector retrieval</li>
@@ -541,7 +571,7 @@ export default function App() {
 
                 <div className="bg-gradient-to-r from-slate-50 to-cyan-50 rounded-xl p-4 mb-4">
                   <img
-                    src="img/RAG_with_n8n.png"
+                    src="img/RAG_with_n8n.webp"
                     alt="n8n and Supabase AI RAG workflow diagram"
                     className="w-full rounded-lg shadow-sm border border-slate-200"
                     onError={(e) => {
@@ -557,16 +587,16 @@ export default function App() {
                     }}
                   />
                   <p className="text-slate-500 text-xs mt-3 text-center italic">
-                    Figure 1: RAG workflow connecting document ingestion, vector storage, and chat retrieval.
+                    Figure 1: Agentic RAG workflow connecting document ingestion, vector storage, and semantic vector retrieval.
                   </p>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div className="flex flex-wrap gap-2">
                     <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs font-medium rounded-full">n8n</span>
-                    <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs font-medium rounded-full">Supabase</span>
-                    <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs font-medium rounded-full">AI</span>
-                    <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs font-medium rounded-full">RAG</span>
+                    <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs font-medium rounded-full">Vector Store</span>
+                    <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs font-medium rounded-full">AI Agent</span>
+                    <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs font-medium rounded-full">Agentic RAG</span>
                   </div>
                   <a
                     href="https://youtu.be/xYkyasMv7LM"
@@ -579,6 +609,61 @@ export default function App() {
                     </svg>
                     Watch Demo
                   </a>
+                </div>
+
+                <div className="mt-6 bg-white rounded-2xl p-6 shadow-sm border border-cyan-200 hover:shadow-lg hover:border-cyan-200 transition-all duration-300">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-cyan-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17.25h4.5M12 3v2.25m6.364 1.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-2.227-1.591 1.591M5.25 12H3m4.227-5.364L5.636 5.045M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h5 className="text-base font-semibold text-slate-800 mb-1">Local OpenClaw AI Agent</h5>
+                      <p className="text-slate-600 text-sm leading-relaxed mb-3">
+                        Building a local autonomous AI agent with OpenClaw powered by local Qwen3 LLM.
+                      </p>
+                      <div className="text-slate-600 text-sm leading-relaxed">
+                        <ul className="list-disc pl-5 space-y-1">
+                          <li>Integration with local Qwen LLM</li>
+                          <li>
+                            Integrated with{' '}
+                            <a
+                              href="https://brave.com/search/api/"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-semibold text-orange-600 hover:text-orange-700 underline decoration-orange-300 hover:decoration-orange-500 transition-colors"
+                            >
+                              Brave Search API
+                            </a>
+                          </li>
+                          <li>Discord messaging integration</li>
+                        </ul>
+                        <p className="mt-3">
+                          This setup creates a practical, privacy-focused AI agent that can understand instructions and act directly on your local machine.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-cyan-100">
+                    <div className="flex flex-wrap gap-2">
+                      <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs font-medium rounded-full">OpenClaw</span>
+                      <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs font-medium rounded-full">Brave API</span>
+                      <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs font-medium rounded-full">Local LLM</span>
+                    </div>
+                    <a
+                      href="https://youtu.be/3L9tZXr1AB8"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors shadow-sm"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                      </svg>
+                      Watch Demo
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -622,7 +707,7 @@ export default function App() {
                 {/* Workflow Diagram Image */}
                 <div className="bg-gradient-to-r from-slate-50 to-orange-50 rounded-xl p-4 mb-4">
                   <img 
-                    src="img/automationAnywhere.png" 
+                    src="img/automationAnywhere.webp" 
                     alt="Automation Anywhere Workflow Diagram" 
                     className="w-full rounded-lg shadow-sm border border-slate-200"
                     onError={(e) => {
@@ -638,7 +723,7 @@ export default function App() {
                     }}
                   />
                   <p className="text-slate-500 text-xs mt-3 text-center italic">
-                    Figure 1: Visual representation of the logic flow and bot structure.
+                    Figure 2: Visual representation of the logic flow and bot structure.
                   </p>
                 </div>
                 
